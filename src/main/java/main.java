@@ -6,13 +6,20 @@ import java.util.List;
 
 public class main {
 
-    public static void main(String[] args) throws IOException {
-        List<String> listTrack =  trackList(args[1]);
-        System.out.println(listTrack.get(0));
-        List<String> fpcalcResult = fpcalc(args[0], listTrack.get(1));
-        System.out.println(fpcalcResult.get(0));
-        System.out.println(fpcalcResult.get(1));
+    public static void main(String[] args) {
+        
+    }
 
+    private static List<String> resultFpcalc(String fpcalcPath, String filePath) throws IOException {
+        List<String> tempFpcalc = new ArrayList<>();
+        List<String> resultFpcalc = new ArrayList<>();
+        List<String> listTrack =  trackList(filePath);
+        for (int i = 0; i < listTrack.size(); i++) {
+            tempFpcalc = fpcalc(fpcalcPath, listTrack.get(i));
+            resultFpcalc.add(tempFpcalc.get(0) + " @ " + tempFpcalc.get(1));
+            System.out.println(resultFpcalc.get(i));
+        }
+        return resultFpcalc;
     }
 
     /**
@@ -25,7 +32,9 @@ public class main {
         File directoryPath = new File(path);
         File filesList[] = directoryPath.listFiles();
         for(File file : filesList) {
-            listTrack.add(file.getAbsolutePath());
+            if(file.toString().contains(".mp3") ) {   //исключаем все файлы кроме mp3
+                listTrack.add(file.getAbsolutePath());
+            }
         }
 
         return listTrack;
@@ -66,8 +75,10 @@ public class main {
         String preResult = output(process.getInputStream());
         List<String> list = Arrays.asList(preResult.replaceAll("FINGERPRINT", "").split("="));
         List<String> Result = new ArrayList<>();
-        Result.add(list.get(1).replaceAll("\n", "").replaceAll(" ", ""));
-        Result.add(list.get(2));
+        char[] temp = new char[3];
+        list.get(1).getChars(0, 3, temp, 0);
+        Result.add(String.valueOf(temp));
+        Result.add(list.get(2).replaceAll("\n", ""));
         return Result;
     }
 }

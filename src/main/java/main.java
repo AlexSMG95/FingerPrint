@@ -1,38 +1,41 @@
-import java.io.File;
-import java.io.IOException;
-import java.util.Map;
-
-import chromaprint.AudioSource;
-import chromaprint.Fingerprint;
-import chromaprint.quick.Fingerprinter;
-import org.tritonus.share.sampled.file.TAudioFileFormat;
-
-import javax.sound.sampled.AudioFileFormat;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.UnsupportedAudioFileException;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 
 public class main {
-    public static void main(String[] args) throws IOException, UnsupportedAudioFileException {
 
-//        File file = new File("C:\\Users\\sav\\Music\\a.mp3");
-//
-//        AudioFileFormat fileFormat = AudioSystem.getAudioFileFormat(file);
-//        Map<?, ?> properties = ((TAudioFileFormat) fileFormat).properties();
-//        String key = "duration";
-//        Long microseconds = (Long) properties.get(key);
-//        System.out.println(microseconds / 1000000);
+    public static void main(String[] args) throws IOException {
+        List<String> fpcalcResult = fpcalc(args[0], "C:\\Users\\sav\\Music\\a.mp3");
+        
+    }
 
-        System.out.println(System.getenv("ffmpeg"));
+    private static String output(InputStream inputStream) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new InputStreamReader(inputStream));
+            String line = null;
+            while ((line = br.readLine()) != null) {
+                sb.append(line + System.getProperty("line.separator"));
+            }
+        } finally {
+            br.close();
+        }
+        return sb.toString();
+    }
 
-
-//        ProcessBuilder processBuilder = new ProcessBuilder( "ffmpeg -i", file.toString(), file.toString().replaceAll("mp3", "flac"));
-//        processBuilder.start();
-//        File file2 = new File(file.toString().replaceAll("mp3", "flac"));
-//        AudioSource source = new AudioSource.AudioFileSource(file2);
-//        Fingerprinter fingerprinter = new Fingerprinter();
-//        Fingerprint fingerprint = fingerprinter.apply(source).unsafeRunSync();
-//        System.out.println(fingerprint.compressed());
-//        file2.delete();
+    private static List<String> fpcalc (String fpcalcPath, String filePath) throws IOException {
+        File file = new File(filePath);
+        ProcessBuilder pb = new ProcessBuilder(fpcalcPath, file.toString());
+        Process process = pb.start();
+        String preResult = output(process.getInputStream());
+        List<String> list = Arrays.asList(preResult.replaceAll("FINGERPRINT", "").split("="));
+        List<String> Result = new ArrayList<>();
+        Result.add(list.get(1));
+        Result.add(list.get(2));
+        return Result;
     }
 }
